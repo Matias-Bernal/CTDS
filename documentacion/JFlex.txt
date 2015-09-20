@@ -1,0 +1,18 @@
+< java imports >
+
+%%
+< jflex options >
+
+%init{
+    < java variables initialization >
+%init}
+
+%{
+    < java variables declarations >
+    < java methods needed >
+%}
+
+< regular expessions macros >
+
+%%
+< lexical actions >
