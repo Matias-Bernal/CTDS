@@ -7,6 +7,7 @@ package cup.example;
 
 import java.util.*;
 import java_cup.runtime.*;
+import ir.ast.*;
 import cup.example.Lexer;
 import java.io.IOException;
 import java.io.File;
@@ -52,8 +53,8 @@ terminal 			NEGACION, CONJUNCION,DISYUNCION;
 terminal 			INT, FLOAT, BOOLEAN;
 terminal Integer	INTEGER_LITERAL;        // our scanner provides numbers as integers
 terminal Float 		FLOAT_LITERAL;
-terminal true 		FALSE_LITERAL;
-terminal false 		TRUE_LITERAL;
+terminal Boolean	FALSE_LITERAL;
+terminal Boolean	TRUE_LITERAL;
 terminal String 	ID;
 
 /* Non terminals */
@@ -72,19 +73,20 @@ non terminal 						  	method_list;
 
 non terminal Body						body;
 non terminal Block						block;
-non terminal		type;
-non terminal		statement;
-non terminal		assign_op;
-non terminal		method_call;
-non terminal		location;
-non terminal		expr;      // used to store evaluated subexpressions
-non terminal		bin_op;
-non terminal		arith_op;
-non terminal		rel_op;
-non terminal		eq_op;
-non terminal		cond_op;
-non terminal 		literal;
-non terminal 		expr_list;
+non terminal Type						type;
+non terminal List<Statement>			statement_list;
+non terminal Statement					statement;
+non terminal AssignOpType				assign_op;
+non terminal MethodCallStmt				method_call;
+non terminal Location					location;
+non terminal Expression					expr;      // used to store evaluated subexpressions
+non terminal BinOpType					bin_op;
+non terminal BinOpType					arith_op;
+non terminal BinOpType					rel_op;
+non terminal BinOpType					eq_op;
+non terminal BinOpType					cond_op;
+non terminal Literal					literal;
+non terminal List<Expression>			expr_list;
 
 /* Precedences */
 precedence right ASIGNACION, ASIGNACION_RESTA, ASIGNACION_SUMA;
@@ -106,59 +108,67 @@ class_decl ::= CLASS ID:c LLAVE_IZQUIERDA:lli field_decl_list:fdl method_decl_li
 field_decl_list		::= field_decl:fd field_decl_list:fld {: fdl.add(fd); RESULT = fdl; :}
 					|/* empty  */  {: RESULT = new LinkedList<FieldDeclaration>(); :};
 
-field_decl 	::= type:t ID:f ident_list:idl PUNTOYCOMA:pc {: idl.add(0,Expr.ident(ixleft,f,ixright));
-                                                               RESULT = new FieldDeclaration(idl); :}
-			| type:t ID:f CORCHETE_IZQUIERDO:ci INTEGER_LITERAL:il CORCHETE_DERECHO:cd ident_list:idl PUNTOYCOMA:pc {: idl.add(0,Expr.ident(ixleft,f,ixright));
-                                                               RESULT = new FieldDeclaration(idl); :};
+field_decl 	::= type:t ID:f ident_list:idl PUNTOYCOMA:pc {: RESULT = new FieldDeclaration(t,f,idl); :}
+			| type:t ID:f CORCHETE_IZQUIERDO:ci INTEGER_LITERAL:il CORCHETE_DERECHO:cd ident_list:idl PUNTOYCOMA:pc {: RESULT = new FieldDeclaration(t,il,f,idl); :};
             
-ident_list  ::= ident_list:idl COMA:c ID:f 	{: idl.add(Expr.ident(ixleft,f,ixright)); RESULT = idl; :}
-    		| /* empty identlist*/			{: RESULT = new LinkedList<Expr.Identifier>(); :};
+ident_list  ::= ident_list:idl COMA:c ID:f 	{: idl.add(new Identifier(f)); RESULT = idl; :}
+    		| /* empty  */	{: RESULT = new LinkedList<Identifier>(); :};
 
 method_decl_list	::= method_decl:md method_decl_list:mdl {: fdl.add(md); RESULT = mdl; :}
 					| /* empty  */  {: RESULT = new LinkedList<MethodDeclaration>(); :};
 
 method_decl ::= type:t ID:m PARENTESIS_IZQUIERDO:pi field_decl_list:fdl PARENTESIS_DERECHO:pd body:b {: RESULT = new MethodDeclaration(t,m,fdl,b); :} /*preguntar por esta clase*/
-			| VOID:v ID:m PARENTESIS_IZQUIERDO:pi field_decl_list:fdl PARENTESIS_DERECHO:pd body:b {: RESULT = new MethodDeclaration(v,m,fdl,b); :};
-			
-body 	::= EXTERN:e PUNTOYCOMA:pc {: RESULT = new Body(e); :} /*Aca deberia importar el codigo desde e?*/
+			| VOID:v ID:m PARENTESIS_IZQUIERDO:pi field_decl_list:fdl PARENTESIS_DERECHO:pd body:b {: RESULT = new MethodDeclaration(Type.VOID,m,fdl,b); :};
+
+body 	::= EXTERN:e PUNTOYCOMA:pc {: RESULT = new Body(true,e); :} /*Aca deberia importar el codigo desde e?*/
 		| block:b {: RESULT = new Body(b):};
-			
-block	::= LLAVE_IZQUIERDA:lli field_decl_list:fdl statement:s LLAVE_DERECHA:lld {: RESULT = new Block(s); :};
 
-type 	::= INT:i {: RESULT = Expr.intconst(i); :}
-		| FLOAT:f {: RESULT = Expr.floatconst(f); :}
-		| BOOLEAN:b {: RESULT = Expr.booleanconst(b); :};
+block	::= LLAVE_IZQUIERDA:lli field_decl_list:fdl statement_list:sl LLAVE_DERECHA:lld {: RESULT = new Block(sl); :};
 
-statement 	::= location:l assign_op:ao expr:e PUNTOYCOMA:pc
-			| method_call:mc PUNTOYCOMA:pc
-			| IF:i PARENTESIS_IZQUIERDO:pi expr:e PARENTESIS_DERECHO:pd statement:s
-			| IF:i PARENTESIS_IZQUIERDO:pi expr:e PARENTESIS_DERECHO:pd statement:s1 ELSE:e statement:s2
-			| FOR:f ID:m IGUAL:i expr:e1 COMA:c expr:e2 statement:s
-			| WHILE:w expr:e statement:s
-			| RETURN:r PUNTOYCOMA:pc
-			| RETURN:r expr:e PUNTOYCOMA:pc
-			| BREAK:b PUNTOYCOMA:pc
-			| CONTINUE:c PUNTOYCOMA:pc
-			| PUNTOYCOMA:pc
-			| block:b
-			;
+
+statement_list	::= statement_list:sl statement:s  {: sl.add(s); RESULT = sl; :}
+				| /* empty  */  {: RESULT = new LinkedList<Statement>(); :};
+
+type 	::= INT:i {: RESULT = Type.INT; :}
+		| FLOAT:f {: RESULT = Type.INT; :}
+		| BOOLEAN:b {: RESULT = Type.INT; :};
+
+
+//////////////////////////////////////////////////
+// HASTA ACA LLEGUE HOY FALTA DE ACA PARA ABAJO //
+//////////////////////////////////////////////////
+
+statement 	::= location:l assign_op:ao expr:e PUNTOYCOMA:pc {: RESULT = new AssignStmt(l,e,ao); :}
+			| method_call:mc PUNTOYCOMA:pc {: RESULT = mc; :}
+			| IF:i PARENTESIS_IZQUIERDO:pi expr:e PARENTESIS_DERECHO:pd statement:s {: RESULT = new IfStmt(e,s); :}
+			| IF:i PARENTESIS_IZQUIERDO:pi expr:e PARENTESIS_DERECHO:pd statement:s1 ELSE:e statement:s2  {: RESULT = new IfStmt(e,s1,s2); :}
+			| FOR:f ID:m IGUAL:i expr:e1 COMA:c expr:e2 statement:s {: RESULT = new ForStmt(m,e1,e2,s); :}
+			| WHILE:w expr:e statement:s {: RESULT = new WhileStmt(e,s); :}
+			| RETURN:r PUNTOYCOMA:pc {: RESULT = new ReturnStmt(); :}
+			| RETURN:r expr:e PUNTOYCOMA:pc {: RESULT = new ReturnStmt(e); :}
+			| BREAK:b PUNTOYCOMA:pc {: RESULT = new BreakStmt(); :}
+			| CONTINUE:c PUNTOYCOMA:pc {: RESULT = new ContinueStmt(); :}
+			| PUNTOYCOMA:pc {: RESULT = new PuntoYComaStmt(); :}
+			| block:b {: RESULT = b :};
 			
-assign_op	::= ASIGNACION:a
-			|ASIGNACION_SUMA:as
-			|ASIGNACION_RESTA:ar
-			;
+assign_op	::= ASIGNACION:a {: RESULT = AssignOpType.ASIGNACION; :}
+			|ASIGNACION_SUMA:as {: RESULT = AssignOpType.ASIGNACION_SUMA; :}
+			|ASIGNACION_RESTA:ar {: RESULT = AssignOpType.ASIGNACION_RESTA; :};
 			
-method_call ::= ID:m PARENTESIS_IZQUIERDO:pi expr_list:expl PARENTESIS_DERECHO:pd
+method_call ::= ID:m PARENTESIS_IZQUIERDO:pi expr_list:expl PARENTESIS_DERECHO:pd {: RESULT = new MethodCallStmt(m,expl); :}
 			| ID:m method_list:ml PARENTESIS_IZQUIERDO:pi expr_list:expl PARENTESIS_DERECHO:pd /*completar*/
 			;
 			
+expr_list ::= COMA:c expr:e expr_list:expl {: expl.add(e); RESULT = expl; :}
+			| /* empty  */  {: RESULT = new LinkedList<Expression>(); :};
+			
 method_list	::= PUNTO:p ID:m method_list:ml
-			| PUNTO:p ID:m PARENTESIS_IZQUIERDO:pi expr:e PARENTESIS_DERECHO:pd method_list:ml
-			| /* empty */
+			| PUNTO:p ID:m method_call:mc method_list:ml
+			| /* empty */  {: RESULT = new LinkedList<Expression>(); :}
 			;
 			
-location	::= ID:m
-			| ID:m CORCHETE_IZQUIERDO:ci expr:e CORCHETE_DERECHO:cd
+location	::= ID:m  {: RESULT = new Location(m); :}
+			| ID:m CORCHETE_IZQUIERDO:ci expr:e CORCHETE_DERECHO:cd {: RESULT = new Location(m,e); :}
 			| ID:m id_list:il
 			| ID:m id_list:il CORCHETE_IZQUIERDO:ci expr:e CORCHETE_DERECHO:cd
 			;
@@ -169,42 +179,36 @@ id_list		::= PUNTO:p ID:m id_list
 
 expr		::= location:l
 			|method_call:mc
-			|literal:l
-			|expr:e1 bin_op:bo expr:e2
-			|RESTA expr:e
-			|NEGACION expr:e
+			|literal:l {: RESULT = l.getType(); :}
+			|expr:e1 bin_op:bo expr:e2 {: RESULT = new BinOpExpression(e1,bo,e2); :}
+			|RESTA expr:e {: RESULT = new UnaryOpExpression(UnaryOpType.RESTA,e); :}
+			|NEGACION expr:e {: RESULT = new UnaryOpExpression(UnaryOpType.NEGACION,e); :}
 			|PARENTESIS_IZQUIERDO:pi expr:e PARENTESIS_DERECHO:pd
 			;
 			
-bin_op		::= arith_op:ao
-			|rel_op:ro
-			|eq_op:eo
-			|cond_op:co
-			;
+bin_op		::= arith_op:ao  {: RESULT = ao; :}
+			|rel_op:ro {: RESULT = ro; :}
+			|eq_op:eo	{: RESULT = eo; :}
+			|cond_op:co {: RESULT = co; :};
 			
-arith_op	::= SUMA:s
-			| RESTA:r
-			| MULTIPLICACION:m
-			| DIVISION:d
-			| PORCENTAJE:p
-			;
+arith_op	::= SUMA:s {: RESULT = BinOpType.SUMA; :}
+			| RESTA:r {: RESULT = BinOpType.RESTA; :}
+			| MULTIPLICACION:m {: RESULT = BinOpType.MULTIPLICACION; :}
+			| DIVISION:d {: RESULT = BinOpType.DIVISION; :}
+			| PORCENTAJE:p {: RESULT = BinOpType.PORCENTAJE; :};
 			
-rel_op		::= MENOR:me
-			| MAYOR:ma
-			| MENOR_IGUAL:mei
-			| MAYOR_IGUAL:mai
-			;
+rel_op		::= MENOR:me {: RESULT = BinOpType.MENOR; :}
+			| MAYOR:ma {: RESULT = BinOpType.MAYOR; :}
+			| MENOR_IGUAL:mei {: RESULT = BinOpType.MENOR_IGUAL; :}
+			| MAYOR_IGUAL:mai {: RESULT = BinOpType.MAYOR_IGUAL; :};
 			
-eq_op		::= IGUAL:i
-			|DESIGUAL:d
-			;
+eq_op		::= IGUAL:i {: RESULT = BinOpType.IGUAL; :}
+			|DESIGUAL:d {: RESULT = BinOpType.DESIGUAL; :};
 			
-cond_op		::= CONJUNCION: c
-			| DISYUNCION: d
-			;
+cond_op		::= CONJUNCION: c {: RESULT = BinOpType.CONJUNCION; :}
+			| DISYUNCION: d {: RESULT = BinOpType.DISYUNCION; :};
 			
-literal		::= INTEGER_LITERAL:i
-			|FLOAT_LITERAL:f
-			|TRUE_LITERAL: t
-			|FALSE_LITERAL:f
-			;
+literal		::= INTEGER_LITERAL:i {: RESULT = new Integer(i); :}
+			|FLOAT_LITERAL:f {: RESULT = new Float(f); :}
+			|TRUE_LITERAL: t {: RESULT = new Boolean(true); :}
+			|FALSE_LITERAL:f {: RESULT = new Boolean(false); :};
