@@ -28,7 +28,7 @@ public enum Type {
 			case FLOATARRAY:
 				return "float[]";
 			case BOOLEANARRAY:
-				return "boolean[]"; /* Que pasa con los arreglos de tamaño fijo??*/
+				return "boolean[]";
 
 		}
 		

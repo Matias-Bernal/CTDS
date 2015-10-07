@@ -8,50 +8,52 @@ package cup.example;
 /** CUP generated interface containing symbol constants. */
 public interface sym {
   /* terminals */
-  public static final int PARENTESIS_DERECHO = 16;
-  public static final int FALSE_LITERAL = 41;
-  public static final int LLAVE_DERECHA = 14;
-  public static final int PARENTESIS_IZQUIERDO = 15;
-  public static final int RESTA = 20;
-  public static final int CONTINUE = 8;
-  public static final int PORCENTAJE = 23;
-  public static final int INT = 36;
-  public static final int TRUE_LITERAL = 42;
-  public static final int FOR = 10;
-  public static final int ASIGNACION_RESTA = 26;
-  public static final int CORCHETE_DERECHO = 18;
-  public static final int IGUAL = 31;
+  public static final int PARENTESIS_DERECHO = 18;
+  public static final int FALSE_LITERAL = 43;
+  public static final int LLAVE_DERECHA = 16;
+  public static final int PARENTESIS_IZQUIERDO = 17;
+  public static final int PUNTOYCOMA = 8;
+  public static final int RESTA = 22;
+  public static final int CONTINUE = 10;
+  public static final int PORCENTAJE = 25;
+  public static final int INT = 38;
+  public static final int TRUE_LITERAL = 44;
+  public static final int FOR = 12;
+  public static final int ASIGNACION_RESTA = 28;
+  public static final int CORCHETE_DERECHO = 20;
+  public static final int IGUAL = 33;
   public static final int CLASS = 2;
-  public static final int ASIGNACION_SUMA = 25;
-  public static final int SUMA = 19;
+  public static final int ASIGNACION_SUMA = 27;
+  public static final int SUMA = 21;
   public static final int EXTERN = 4;
-  public static final int CORCHETE_IZQUIERDO = 17;
-  public static final int IF = 11;
-  public static final int ID = 43;
-  public static final int BOOLEAN = 38;
+  public static final int CORCHETE_IZQUIERDO = 19;
+  public static final int IF = 13;
+  public static final int ID = 45;
+  public static final int BOOLEAN = 40;
   public static final int EOF = 0;
   public static final int RETURN = 3;
   public static final int error = 1;
   public static final int COMA = 6;
-  public static final int NEGACION = 33;
-  public static final int MENOR = 27;
-  public static final int BREAK = 7;
+  public static final int NEGACION = 35;
+  public static final int MENOR = 29;
+  public static final int BREAK = 9;
   public static final int VOID = 5;
-  public static final int DESIGUAL = 32;
-  public static final int ASIGNACION = 24;
-  public static final int MAYOR = 28;
-  public static final int ELSE = 9;
-  public static final int WHILE = 12;
-  public static final int MAYOR_IGUAL = 30;
-  public static final int FLOAT = 37;
-  public static final int CONJUNCION = 34;
-  public static final int LLAVE_IZQUIERDA = 13;
-  public static final int DISYUNCION = 35;
-  public static final int MENOR_IGUAL = 29;
-  public static final int FLOAT_LITERAL = 40;
-  public static final int DIVISION = 22;
-  public static final int MULTIPLICACION = 21;
-  public static final int INTEGER_LITERAL = 39;
+  public static final int DESIGUAL = 34;
+  public static final int ASIGNACION = 26;
+  public static final int MAYOR = 30;
+  public static final int ELSE = 11;
+  public static final int PUNTO = 7;
+  public static final int WHILE = 14;
+  public static final int MAYOR_IGUAL = 32;
+  public static final int FLOAT = 39;
+  public static final int CONJUNCION = 36;
+  public static final int LLAVE_IZQUIERDA = 15;
+  public static final int DISYUNCION = 37;
+  public static final int MENOR_IGUAL = 31;
+  public static final int FLOAT_LITERAL = 42;
+  public static final int DIVISION = 24;
+  public static final int MULTIPLICACION = 23;
+  public static final int INTEGER_LITERAL = 41;
   public static final String[] terminalNames = new String[] {
   "EOF",
   "error",
@@ -60,6 +62,8 @@ public interface sym {
   "EXTERN",
   "VOID",
   "COMA",
+  "PUNTO",
+  "PUNTOYCOMA",
   "BREAK",
   "CONTINUE",
   "ELSE",

@@ -3,21 +3,21 @@ package ir.ast;
 import ir.ASTVisitor;
 
 public class AssignStmt extends Statement {
-	private Location location;
+	private ir.ast.Location location;
 	private Expression expression;
 	private AssignOpType operator;
 
-	public AssignStmt(Location l, AssignOpType o, Expression e) {
+	public AssignStmt(ir.ast.Location l, AssignOpType o, Expression e) {
 		location = l;
 		operator = o;
 		expression = e;
 	}
 	
-	public void setLocation(Location l) {
+	public void setLocation(ir.ast.Location l) {
 		location = l;
 	}
 	
-	public Location getLocation() {
+	public ir.ast.Location getLocation() {
 		return location;
 	}
 	

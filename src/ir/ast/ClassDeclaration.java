@@ -2,23 +2,25 @@ package ir.ast;
 
 import java.util.LinkedList;
 
-public class ClassDeclaration {
+import ir.ASTVisitor;
+
+public class ClassDeclaration extends AST{
 	
-	private String id;
+	private Identifier id;
 	private LinkedList<FieldDeclaration> field_declartion_list;
 	private LinkedList<MethodDeclaration> method_declaration_list;
 	
-	public ClassDeclaration(String i,LinkedList<FieldDeclaration> fdl, LinkedList<MethodDeclaration> mdl){
+	public ClassDeclaration(Identifier i,LinkedList<FieldDeclaration> fdl, LinkedList<MethodDeclaration> mdl){
 		id = i;
 		field_declartion_list = fdl;
 		method_declaration_list = mdl;
 	}
 
-	public String getId() {
+	public Identifier getId() {
 		return id;
 	}
 
-	public void setId(String id) {
+	public void setId(Identifier id) {
 		this.id = id;
 	}
 
@@ -36,6 +38,11 @@ public class ClassDeclaration {
 
 	public void setMethod_declaration_list(LinkedList<MethodDeclaration> method_declaration_list) {
 		this.method_declaration_list = method_declaration_list;
+	}
+
+	@Override
+	public <T> T accept(ASTVisitor<T> v) {
+		return v.visit(this);
 	}
 
 }

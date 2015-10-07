@@ -2,20 +2,22 @@ package ir.ast;
 
 import java.util.LinkedList;
 
-public class FieldDeclaration {
+import ir.ASTVisitor;
+
+public class FieldDeclaration extends AST{
 	
 	private Type type;
-	private String id;
+	private Identifier id;
 	private Integer lenght;
 	private LinkedList<Identifier> identifier_list;
 	
-	public FieldDeclaration(Type t,String i,LinkedList<Identifier> il){
+	public FieldDeclaration(Type t,Identifier i,LinkedList<Identifier> il){
 		type = t;
 		id = i;
 		identifier_list = il;
 	}
 	
-	public FieldDeclaration(Type t,Integer l,String i,LinkedList<Identifier> il){
+	public FieldDeclaration(Type t,Integer l,Identifier i,LinkedList<Identifier> il){
 		switch(t) {
 		case INT:
 			type = Type.INTARRAY;
@@ -43,11 +45,11 @@ public class FieldDeclaration {
 		this.type = type;
 	}
 
-	public String getId() {
+	public Identifier getId() {
 		return id;
 	}
 
-	public void setId(String id) {
+	public void setId(Identifier id) {
 		this.id = id;
 	}
 
@@ -65,6 +67,11 @@ public class FieldDeclaration {
 
 	public void setIdentifier_list(LinkedList<Identifier> identifier_list) {
 		this.identifier_list = identifier_list;
+	}
+	
+	@Override
+	public <T> T accept(ASTVisitor<T> v) {
+		return v.visit(this);
 	}
 
 }

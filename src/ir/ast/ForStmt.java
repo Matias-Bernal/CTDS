@@ -7,9 +7,9 @@ public class ForStmt extends Statement{
 	private String id;
 	private Expression assignExpr;
 	private Expression stopCondition;
-	private Block block;
+	private Statement block;
 	
-	public ForStmt(String id, Expression assignExpr, Expression stopCondition, Block block) {
+	public ForStmt(String id, Expression assignExpr, Expression stopCondition, Statement block) {
 		super();
 		this.id = id;
 		this.assignExpr = assignExpr;
@@ -41,11 +41,11 @@ public class ForStmt extends Statement{
 		this.stopCondition = stopCondition;
 	}
 
-	public Block getBlock() {
+	public Statement getBlock() {
 		return block;
 	}
 	
-	public void setBlock(Block block) {
+	public void setBlock(Statement block) {
 		this.block = block;
 	}
 

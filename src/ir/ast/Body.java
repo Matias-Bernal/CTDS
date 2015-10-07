@@ -1,19 +1,19 @@
 package ir.ast;
 
-public class Body {
+import ir.ASTVisitor;
+
+public class Body extends AST {
 	
 	private boolean extern;
-	private String reference;
 	private Block block;
 	
 	public Body(Block block) {
 		super();
 		this.block = block;
 	}
-	public Body(boolean extern, String reference) {
+	public Body(boolean extern) {
 		super();
 		this.extern = extern;
-		this.reference = reference;
 	}
 	
 	public boolean isExtern() {
@@ -22,17 +22,17 @@ public class Body {
 	public void setExtern(boolean extern) {
 		this.extern = extern;
 	}
-	public String getReference() {
-		return reference;
-	}
-	public void setReference(String reference) {
-		this.reference = reference;
-	}
 	public Block getBlock() {
 		return block;
 	}
 	public void setBlock(Block block) {
 		this.block = block;
 	}
+	
+	@Override
+	public <T> T accept(ASTVisitor<T> v) {
+		return v.visit(this);
+	}
+
 
 }

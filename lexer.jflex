@@ -88,13 +88,12 @@ Id =  {Alpha} {Alpha_Num}*
 
 	{Whitespace}	{                             	}
 	{Comment}		{								}
-	{Id}			{ return symbolFactory.newSymbol("ID", ID, yytext() ); }
  	{Integer}    	{ return symbolFactory.newSymbol("INTEGER_LITERAL", INTEGER_LITERAL, Integer.valueOf(yytext()) ); }
- 	{Float}	    	{ return symbolFactory.newSymbol("FLOAT_LITERAL", FLOAT_LITERAL, Float.valueOf(yytext()) ); } /* Salida Repetida? */
-	"false"			{ return symbolFactory.newSymbol("FALSE_LITERAL", FALSE_LITERAL); Bolean.valueOf("true") ); }
-	"true"			{ return symbolFactory.newSymbol("TRUE_LITERAL", TRUE_LITERAL); Bolean.valueOf("false") ); }
+ 	{Float}	    	{ return symbolFactory.newSymbol("FLOAT_LITERAL", FLOAT_LITERAL, Float.valueOf(yytext()) ); } 
+	"false"			{ return symbolFactory.newSymbol("FALSE_LITERAL", FALSE_LITERAL, Boolean.valueOf("false") ); }
+	"true"			{ return symbolFactory.newSymbol("TRUE_LITERAL", TRUE_LITERAL, Boolean.valueOf("true") ); }
 
-	"boolean"		{ return symbolFactory.newSymbol("BOOLEAN", BOOLEAN}
+	"boolean"		{ return symbolFactory.newSymbol("BOOLEAN", BOOLEAN);}
 	"break"			{ return symbolFactory.newSymbol("BREAK", BREAK); }
 	"class"			{ return symbolFactory.newSymbol("CLASS", CLASS); }
 	"continue"		{ return symbolFactory.newSymbol("CONTINUE", CONTINUE); }
@@ -139,6 +138,8 @@ Id =  {Alpha} {Alpha_Num}*
 
 	"&&"			{ return symbolFactory.newSymbol("CONJUNCION", CONJUNCION); }
 	"||"			{ return symbolFactory.newSymbol("DISYUNCION", DISYUNCION); }
+	
+	{Id}			{ return symbolFactory.newSymbol("ID", ID, yytext() ); }
 	
 	. 				{ emit_warning("Caracter Illegal: '" +yytext()+"' En ["+yyline+","+yycolumn+"]");}
 }

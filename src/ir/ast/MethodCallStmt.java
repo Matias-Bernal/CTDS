@@ -8,14 +8,14 @@ public class MethodCallStmt extends Statement {
 
 	private String id;
 	private LinkedList<Expression> expression_list;
-	private LinkedList<MethodDeclaration> method_declaration_list;
+	private LinkedList<Identifier> identifier_list;
 	
 	public MethodCallStmt(String id, LinkedList<Expression> expression_list,
-			LinkedList<MethodDeclaration> method_declaration_list) {
+			LinkedList<Identifier> identifier_list) {
 		super();
 		this.id = id;
 		this.expression_list = expression_list;
-		this.method_declaration_list = method_declaration_list;
+		this.identifier_list = identifier_list;
 	}
 	
 	public MethodCallStmt(String id, LinkedList<Expression> expression_list) {
@@ -40,12 +40,12 @@ public class MethodCallStmt extends Statement {
 		this.expression_list = expression_list;
 	}
 
-	public LinkedList<MethodDeclaration> getMethod_declaration_list() {
-		return method_declaration_list;
+	public LinkedList<Identifier> getIdentifier_list() {
+		return identifier_list;
 	}
 
-	public void setMethod_declaration_list(LinkedList<MethodDeclaration> method_declaration_list) {
-		this.method_declaration_list = method_declaration_list;
+	public void setIdentifier_list(LinkedList<Identifier> identifier_list) {
+		this.identifier_list = identifier_list;
 	}
 
 	@Override

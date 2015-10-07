@@ -5,9 +5,9 @@ import ir.ASTVisitor;
 public class WhileStmt extends Statement {
 	
     private Expression continuationCondition;
-	private Block block;
+	private Statement block;
 	
-	public WhileStmt(Expression continuationCondition, Block block) {
+	public WhileStmt(Expression continuationCondition, Statement block) {
 		this.continuationCondition = continuationCondition;
 		this.block = block;
 	}
@@ -20,11 +20,11 @@ public class WhileStmt extends Statement {
 		this.continuationCondition = continuationCondition;
 	}
 
-	public Block getBlock() {
+	public Statement getBlock() {
 		return block;
 	}
 
-	public void setBlock(Block block) {
+	public void setBlock(Statement block) {
 		this.block = block;
 	}
 

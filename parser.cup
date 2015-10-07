@@ -14,9 +14,7 @@ import java.io.File;
 import java.io.FileInputStream;
 
 parser code {:
-
   public boolean syntaxErrors;
-
   protected Lexer lexer;
 :}
 
@@ -36,57 +34,84 @@ init with {:
 scan with {: return lexer.next_token(); :};
 
 /* Terminals (tokens returned by the scanner). */
-terminal 			CLASS,RETURN,EXTERN,VOID,COMA,PUNTO,PUNTOYCOMA;
+terminal 			CLASS;
+terminal 			RETURN;
+terminal 			EXTERN;
+terminal 			VOID;
+terminal 			COMA;
+terminal 			PUNTO;
+terminal 			PUNTOYCOMA;
 /*Terminales estructuras de control*/
-terminal 			BREAK,CONTINUE,ELSE,FOR,IF,WHILE;
+terminal 			BREAK;
+terminal 			CONTINUE;
+terminal 			ELSE;
+terminal 			FOR;
+terminal 			IF;
+terminal 			WHILE;
 /*Terminales llaves,parentesis y corchetes*/
-terminal 			LLAVE_IZQUIERDA,LLAVE_DERECHA,PARENTESIS_IZQUIERDO,PARENTESIS_DERECHO,CORCHETE_IZQUIERDO,CORCHETE_DERECHO;
+terminal 			LLAVE_IZQUIERDA;
+terminal 			LLAVE_DERECHA;
+terminal 			PARENTESIS_IZQUIERDO;
+terminal 			PARENTESIS_DERECHO;
+terminal 			CORCHETE_IZQUIERDO;
+terminal 			CORCHETE_DERECHO;
 /*Terminales operaciones aritmeticas*/
-terminal 			SUMA,RESTA,MULTIPLICACION,DIVISION,PORCENTAJE;
+terminal 			SUMA;
+terminal 			RESTA;
+terminal 			MULTIPLICACION;
+terminal 			DIVISION;
+terminal 			PORCENTAJE;
 /*Terminales operaciones asignacion*/
-terminal 			ASIGNACION,ASIGNACION_SUMA,ASIGNACION_RESTA;
+terminal 			ASIGNACION;
+terminal 			ASIGNACION_SUMA;
+terminal 			ASIGNACION_RESTA;
 /*Terminales operaciones comparacion*/
-terminal 			MENOR,MAYOR,MENOR_IGUAL,MAYOR_IGUAL,IGUAL,DESIGUAL;
+terminal 			MENOR;
+terminal 			MAYOR;
+terminal 			MENOR_IGUAL;
+terminal 			MAYOR_IGUAL;
+terminal 			IGUAL;
+terminal 			DESIGUAL;
 /*Terminales operaciones logicas*/
-terminal 			NEGACION, CONJUNCION,DISYUNCION;
+terminal 			NEGACION;
+terminal 			CONJUNCION;
+terminal 			DISYUNCION;
 /*Terminales tipos*/
-terminal 			INT, FLOAT, BOOLEAN;
+terminal Type		INT;
+terminal Type		FLOAT;
+terminal Type		BOOLEAN;
 terminal Integer	INTEGER_LITERAL;        // our scanner provides numbers as integers
-terminal Float 		FLOAT_LITERAL;
+terminal Float 	FLOAT_LITERAL;
 terminal Boolean	FALSE_LITERAL;
 terminal Boolean	TRUE_LITERAL;
 terminal String 	ID;
 
 /* Non terminals */
-non terminal Program 					program;
-
-non terminal List<ClassDeclaration>		class_decl_list;
-non terminal ClassDeclaration       	class_decl;
-
-non terminal List<FieldDeclaration>		field_decl_list;
-non terminal FieldDeclaration			field_decl;
-non terminal List<Expr.Identifier>  	ident_list;
-non terminal 							id_list;
-non terminal List<MethodDeclaration>	method_decl_list;
-non terminal MethodDeclaration			method_decl;
-non terminal 						  	method_list;
-
-non terminal Body						body;
-non terminal Block						block;
-non terminal Type						type;
-non terminal List<Statement>			statement_list;
-non terminal Statement					statement;
-non terminal AssignOpType				assign_op;
+non terminal Program 						program;
+non terminal LinkedList<ClassDeclaration>	class_decl_list;
+non terminal ClassDeclaration       		class_decl;
+non terminal LinkedList<FieldDeclaration>	field_decl_list;
+non terminal FieldDeclaration				field_decl;
+non terminal LinkedList<Identifier>		ident_list;
+non terminal LinkedList<Identifier>		id_list;
+non terminal LinkedList<MethodDeclaration>	method_decl_list;
+non terminal MethodDeclaration				method_decl;
+non terminal Body							body;
+non terminal Block							block;
+non terminal Type							type;
+non terminal LinkedList<Statement>			statement_list;
+non terminal Statement						statement;
+non terminal AssignOpType					assign_op;
 non terminal MethodCallStmt				method_call;
-non terminal Location					location;
-non terminal Expression					expr;      // used to store evaluated subexpressions
-non terminal BinOpType					bin_op;
-non terminal BinOpType					arith_op;
-non terminal BinOpType					rel_op;
-non terminal BinOpType					eq_op;
-non terminal BinOpType					cond_op;
-non terminal Literal					literal;
-non terminal List<Expression>			expr_list;
+non terminal ir.ast.Location				location;
+non terminal Expression					expr;
+non terminal BinOpType						bin_op;
+non terminal BinOpType						arith_op;
+non terminal BinOpType						rel_op;
+non terminal BinOpType						eq_op;
+non terminal BinOpType						cond_op;
+non terminal Literal						literal;
+non terminal LinkedList<Expression>		expr_list;
 
 /* Precedences */
 precedence right ASIGNACION, ASIGNACION_RESTA, ASIGNACION_SUMA;
@@ -95,120 +120,108 @@ precedence left SUMA, RESTA, MULTIPLICACION, DIVISION, PORCENTAJE;
 precedence left NEGACION, MENOR, MAYOR, MENOR_IGUAL, MAYOR_IGUAL, IGUAL, DESIGUAL;
 precedence left CONJUNCION, DISYUNCION;
 
-/* The grammar rules */
-program ::= class_decl_list:cdl {: RESULT = new Program(cdl); :} ;
-/* declaracion de clase/s */
+start with program;
 
-class_decl_list	::= class_decl:c class_decl_list:cdl {: cdl.add(c); RESULT = cdl; :} /*chequeo de clase existente y clase main */
+program ::= class_decl_list:cdl {: RESULT = new Program(cdl); :} ;
+
+class_decl_list	::= class_decl:c class_decl_list:cdl {: cdl.add(c); RESULT = cdl; :}
 				| /* empty */  {: RESULT = new LinkedList<ClassDeclaration>(); :};
 
-class_decl ::= CLASS ID:c LLAVE_IZQUIERDA:lli field_decl_list:fdl method_decl_list:mdl LLAVE_DERECHA:lld {: RESULT = new ClassDeclaration(c,fdl,mdl); :} ;
+class_decl ::=   CLASS ID:c LLAVE_IZQUIERDA field_decl_list:fdl method_decl_list:mdl LLAVE_DERECHA {: RESULT = new ClassDeclaration(new Identifier(c),fdl,mdl); :}
+				|CLASS ID:c LLAVE_IZQUIERDA field_decl_list:fdl LLAVE_DERECHA {: RESULT = new ClassDeclaration(new Identifier(c),fdl,new LinkedList<MethodDeclaration>()); :}
+				|CLASS ID:c LLAVE_IZQUIERDA method_decl_list:mdl LLAVE_DERECHA {: RESULT = new ClassDeclaration(new Identifier(c),new LinkedList<FieldDeclaration>(),mdl); :};	
 
-/* declaracion de campos y metodos */
-field_decl_list		::= field_decl:fd field_decl_list:fld {: fdl.add(fd); RESULT = fdl; :}
-					|/* empty  */  {: RESULT = new LinkedList<FieldDeclaration>(); :};
+field_decl_list	::= field_decl_list:fdl field_decl:fd {: fdl.add(fd); RESULT = fdl; :}
+				| field_decl:fd {: LinkedList<FieldDeclaration> fdl = new LinkedList<FieldDeclaration>() ; fdl.add(fd); RESULT = fdl; :};
+				
 
-field_decl 	::= type:t ID:f ident_list:idl PUNTOYCOMA:pc {: RESULT = new FieldDeclaration(t,f,idl); :}
-			| type:t ID:f CORCHETE_IZQUIERDO:ci INTEGER_LITERAL:il CORCHETE_DERECHO:cd ident_list:idl PUNTOYCOMA:pc {: RESULT = new FieldDeclaration(t,il,f,idl); :};
+field_decl 	::= type:t ID:f ident_list:idl PUNTOYCOMA {: RESULT = new FieldDeclaration(t,new Identifier(f),idl); :}
+			| type:t ID:f CORCHETE_IZQUIERDO INTEGER_LITERAL:il CORCHETE_DERECHO ident_list:idl PUNTOYCOMA {: RESULT = new FieldDeclaration(t,il,new Identifier(f),idl); :};
             
-ident_list  ::= ident_list:idl COMA:c ID:f 	{: idl.add(new Identifier(f)); RESULT = idl; :}
-    		| /* empty  */	{: RESULT = new LinkedList<Identifier>(); :};
+ident_list  ::= ident_list:idl COMA ID:f {: idl.add(new Identifier(f)); RESULT = idl; :}
+	    		| /* empty  */	{: RESULT = new LinkedList<Identifier>(); :};
 
-method_decl_list	::= method_decl:md method_decl_list:mdl {: fdl.add(md); RESULT = mdl; :}
-					| /* empty  */  {: RESULT = new LinkedList<MethodDeclaration>(); :};
+method_decl_list ::= method_decl_list:mdl method_decl:md {: mdl.add(md); RESULT = mdl; :} 
+				| method_decl:md {: LinkedList<MethodDeclaration> mdl = new LinkedList<MethodDeclaration>() ; mdl.add(md); RESULT = mdl; :};
 
-method_decl ::= type:t ID:m PARENTESIS_IZQUIERDO:pi field_decl_list:fdl PARENTESIS_DERECHO:pd body:b {: RESULT = new MethodDeclaration(t,m,fdl,b); :} /*preguntar por esta clase*/
-			| VOID:v ID:m PARENTESIS_IZQUIERDO:pi field_decl_list:fdl PARENTESIS_DERECHO:pd body:b {: RESULT = new MethodDeclaration(Type.VOID,m,fdl,b); :};
 
-body 	::= EXTERN:e PUNTOYCOMA:pc {: RESULT = new Body(true,e); :} /*Aca deberia importar el codigo desde e?*/
-		| block:b {: RESULT = new Body(b):};
+method_decl ::= type:t ID:m PARENTESIS_IZQUIERDO field_decl_list:fdl PARENTESIS_DERECHO body:b {: RESULT = new MethodDeclaration(t,new Identifier(m),fdl,b); :}
+			| VOID ID:m PARENTESIS_IZQUIERDO field_decl_list:fdl PARENTESIS_DERECHO body:b {: RESULT = new MethodDeclaration(Type.VOID,new Identifier(m),fdl,b); :};
 
-block	::= LLAVE_IZQUIERDA:lli field_decl_list:fdl statement_list:sl LLAVE_DERECHA:lld {: RESULT = new Block(sl); :};
+body 	::= EXTERN PUNTOYCOMA {: RESULT = new Body(true); :} 
+		| block:b {: RESULT = new Body(b); :};
+
+block	::= LLAVE_IZQUIERDA field_decl_list:fdl statement_list:sl LLAVE_DERECHA {: RESULT = new Block(sl); :};
 
 
 statement_list	::= statement_list:sl statement:s  {: sl.add(s); RESULT = sl; :}
 				| /* empty  */  {: RESULT = new LinkedList<Statement>(); :};
 
-type 	::= INT:i {: RESULT = Type.INT; :}
-		| FLOAT:f {: RESULT = Type.INT; :}
-		| BOOLEAN:b {: RESULT = Type.INT; :};
+type ::= INT {: RESULT = Type.INT; :}
+		|FLOAT {: RESULT = Type.FLOAT; :}
+		|BOOLEAN {: RESULT = Type.BOOLEAN; :};
 
-
-//////////////////////////////////////////////////
-// HASTA ACA LLEGUE HOY FALTA DE ACA PARA ABAJO //
-//////////////////////////////////////////////////
-
-statement 	::= location:l assign_op:ao expr:e PUNTOYCOMA:pc {: RESULT = new AssignStmt(l,e,ao); :}
-			| method_call:mc PUNTOYCOMA:pc {: RESULT = mc; :}
-			| IF:i PARENTESIS_IZQUIERDO:pi expr:e PARENTESIS_DERECHO:pd statement:s {: RESULT = new IfStmt(e,s); :}
-			| IF:i PARENTESIS_IZQUIERDO:pi expr:e PARENTESIS_DERECHO:pd statement:s1 ELSE:e statement:s2  {: RESULT = new IfStmt(e,s1,s2); :}
-			| FOR:f ID:m IGUAL:i expr:e1 COMA:c expr:e2 statement:s {: RESULT = new ForStmt(m,e1,e2,s); :}
-			| WHILE:w expr:e statement:s {: RESULT = new WhileStmt(e,s); :}
-			| RETURN:r PUNTOYCOMA:pc {: RESULT = new ReturnStmt(); :}
-			| RETURN:r expr:e PUNTOYCOMA:pc {: RESULT = new ReturnStmt(e); :}
-			| BREAK:b PUNTOYCOMA:pc {: RESULT = new BreakStmt(); :}
-			| CONTINUE:c PUNTOYCOMA:pc {: RESULT = new ContinueStmt(); :}
-			| PUNTOYCOMA:pc {: RESULT = new PuntoYComaStmt(); :}
-			| block:b {: RESULT = b :};
+statement 	::= location:l assign_op:ao expr:e PUNTOYCOMA {: RESULT = new AssignStmt(l,ao,e); :}
+			| method_call:mc PUNTOYCOMA {: RESULT = mc; :}
+			| IF PARENTESIS_IZQUIERDO expr:e PARENTESIS_DERECHO statement:s {: RESULT = new IfStmt(e,s); :}
+			| IF PARENTESIS_IZQUIERDO expr:e PARENTESIS_DERECHO statement:s1 ELSE statement:s2  {: RESULT = new IfStmt(e,s1,s2); :}
+			| FOR ID:m IGUAL expr:e1 COMA expr:e2 statement:s {: RESULT = new ForStmt(m,e1,e2,s); :}
+			| WHILE expr:e statement:s {: RESULT = new WhileStmt(e,s); :}
+			| RETURN PUNTOYCOMA {: RESULT = new ReturnStmt(); :}
+			| RETURN expr:e PUNTOYCOMA {: RESULT = new ReturnStmt(e); :}
+			| BREAK PUNTOYCOMA {: RESULT = new BreakStmt(); :}
+			| CONTINUE PUNTOYCOMA {: RESULT = new ContinueStmt(); :}
+			| PUNTOYCOMA {: RESULT = new PuntoYComaStmt(); :}
+			| block:b {: RESULT = b; :};
 			
-assign_op	::= ASIGNACION:a {: RESULT = AssignOpType.ASIGNACION; :}
-			|ASIGNACION_SUMA:as {: RESULT = AssignOpType.ASIGNACION_SUMA; :}
-			|ASIGNACION_RESTA:ar {: RESULT = AssignOpType.ASIGNACION_RESTA; :};
+assign_op	::= ASIGNACION {: RESULT = AssignOpType.ASIGNACION; :}
+			|ASIGNACION_SUMA {: RESULT = AssignOpType.ASIGNACION_SUMA; :}
+			|ASIGNACION_RESTA {: RESULT = AssignOpType.ASIGNACION_RESTA; :};
 			
-method_call ::= ID:m PARENTESIS_IZQUIERDO:pi expr_list:expl PARENTESIS_DERECHO:pd {: RESULT = new MethodCallStmt(m,expl); :}
-			| ID:m method_list:ml PARENTESIS_IZQUIERDO:pi expr_list:expl PARENTESIS_DERECHO:pd /*completar*/
-			;
+method_call ::= ID:m PARENTESIS_IZQUIERDO expr_list:expl PARENTESIS_DERECHO {: RESULT = new MethodCallStmt(m,expl); :}
+			|   ID:m id_list:il PARENTESIS_IZQUIERDO expr_list:expl PARENTESIS_DERECHO {: RESULT = new MethodCallStmt(m,expl,il); :};
 			
-expr_list ::= COMA:c expr:e expr_list:expl {: expl.add(e); RESULT = expl; :}
+expr_list ::= COMA expr:e expr_list:expl {: expl.add(e); RESULT = expl; :}
 			| /* empty  */  {: RESULT = new LinkedList<Expression>(); :};
+				
+location ::= ID:m id_list:il {: RESULT = new VarLocation(new Identifier(m),il); :}
+		 |   ID:m id_list:il CORCHETE_IZQUIERDO expr:e CORCHETE_DERECHO {: RESULT = new ArrayLocation(new Identifier(m),e,il); :};
 			
-method_list	::= PUNTO:p ID:m method_list:ml
-			| PUNTO:p ID:m method_call:mc method_list:ml
-			| /* empty */  {: RESULT = new LinkedList<Expression>(); :}
-			;
-			
-location	::= ID:m  {: RESULT = new Location(m); :}
-			| ID:m CORCHETE_IZQUIERDO:ci expr:e CORCHETE_DERECHO:cd {: RESULT = new Location(m,e); :}
-			| ID:m id_list:il
-			| ID:m id_list:il CORCHETE_IZQUIERDO:ci expr:e CORCHETE_DERECHO:cd
-			;
-			
-id_list		::= PUNTO:p ID:m id_list
-			| /* empty */
-			;
+id_list		::= PUNTO ID:m id_list:il  {: il.add(new Identifier(m)); RESULT = il; :}
+			| /* empty  */  {: RESULT = new LinkedList<Identifier>(); :};
 
-expr		::= location:l
-			|method_call:mc
-			|literal:l {: RESULT = l.getType(); :}
+expr		::= location:l {: RESULT = l; :}
+			|method_call:mc {: RESULT = new MethodCallExpression(mc); :}
+			|literal:l {: RESULT = l; :}
 			|expr:e1 bin_op:bo expr:e2 {: RESULT = new BinOpExpression(e1,bo,e2); :}
 			|RESTA expr:e {: RESULT = new UnaryOpExpression(UnaryOpType.RESTA,e); :}
 			|NEGACION expr:e {: RESULT = new UnaryOpExpression(UnaryOpType.NEGACION,e); :}
-			|PARENTESIS_IZQUIERDO:pi expr:e PARENTESIS_DERECHO:pd
+			|PARENTESIS_IZQUIERDO expr:e PARENTESIS_DERECHO {: RESULT = e; :}
 			;
-			
+						
 bin_op		::= arith_op:ao  {: RESULT = ao; :}
 			|rel_op:ro {: RESULT = ro; :}
 			|eq_op:eo	{: RESULT = eo; :}
 			|cond_op:co {: RESULT = co; :};
 			
-arith_op	::= SUMA:s {: RESULT = BinOpType.SUMA; :}
-			| RESTA:r {: RESULT = BinOpType.RESTA; :}
-			| MULTIPLICACION:m {: RESULT = BinOpType.MULTIPLICACION; :}
-			| DIVISION:d {: RESULT = BinOpType.DIVISION; :}
-			| PORCENTAJE:p {: RESULT = BinOpType.PORCENTAJE; :};
+arith_op	::= SUMA {: RESULT = BinOpType.SUMA; :}
+			| RESTA {: RESULT = BinOpType.RESTA; :}
+			| MULTIPLICACION {: RESULT = BinOpType.MULTIPLICACION; :}
+			| DIVISION {: RESULT = BinOpType.DIVISION; :}
+			| PORCENTAJE {: RESULT = BinOpType.PORCENTAJE; :};
 			
-rel_op		::= MENOR:me {: RESULT = BinOpType.MENOR; :}
-			| MAYOR:ma {: RESULT = BinOpType.MAYOR; :}
-			| MENOR_IGUAL:mei {: RESULT = BinOpType.MENOR_IGUAL; :}
-			| MAYOR_IGUAL:mai {: RESULT = BinOpType.MAYOR_IGUAL; :};
+rel_op		::= MENOR {: RESULT = BinOpType.MENOR; :}
+			| MAYOR {: RESULT = BinOpType.MAYOR; :}
+			| MENOR_IGUAL {: RESULT = BinOpType.MENOR_IGUAL; :}
+			| MAYOR_IGUAL {: RESULT = BinOpType.MAYOR_IGUAL; :};
 			
-eq_op		::= IGUAL:i {: RESULT = BinOpType.IGUAL; :}
-			|DESIGUAL:d {: RESULT = BinOpType.DESIGUAL; :};
+eq_op		::= IGUAL {: RESULT = BinOpType.IGUAL; :}
+			|DESIGUAL {: RESULT = BinOpType.DESIGUAL; :};
 			
-cond_op		::= CONJUNCION: c {: RESULT = BinOpType.CONJUNCION; :}
-			| DISYUNCION: d {: RESULT = BinOpType.DISYUNCION; :};
+cond_op		::= CONJUNCION {: RESULT = BinOpType.CONJUNCION; :}
+			| DISYUNCION {: RESULT = BinOpType.DISYUNCION; :};
 			
-literal		::= INTEGER_LITERAL:i {: RESULT = new Integer(i); :}
-			|FLOAT_LITERAL:f {: RESULT = new Float(f); :}
-			|TRUE_LITERAL: t {: RESULT = new Boolean(true); :}
-			|FALSE_LITERAL:f {: RESULT = new Boolean(false); :};
+literal		::= INTEGER_LITERAL:i {: RESULT = new IntegerLiteral(i); :}
+			|FLOAT_LITERAL:f {: RESULT = new FloatLiteral(f); :}
+			|TRUE_LITERAL: t {: RESULT = new BooleanLiteral(true); :}
+			|FALSE_LITERAL:f {: RESULT = new BooleanLiteral(false); :};

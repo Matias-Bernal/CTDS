@@ -2,14 +2,16 @@ package ir.ast;
 
 import java.util.LinkedList;
 
-public class MethodDeclaration {
+import ir.ASTVisitor;
+
+public class MethodDeclaration extends AST {
 	
 	private Type type;
-	private String id;
+	private Identifier id;
 	private LinkedList<FieldDeclaration> field_declartion_list;
 	private Body body;
 	
-	public MethodDeclaration(Type type, String id, LinkedList<FieldDeclaration> field_declartion_list, Body body) {
+	public MethodDeclaration(Type type, Identifier id, LinkedList<FieldDeclaration> field_declartion_list, Body body) {
 		super();
 		this.type = type;
 		this.id = id;
@@ -23,10 +25,10 @@ public class MethodDeclaration {
 	public void setType(Type type) {
 		this.type = type;
 	}
-	public String getId() {
+	public Identifier getId() {
 		return id;
 	}
-	public void setId(String id) {
+	public void setId(Identifier id) {
 		this.id = id;
 	}
 	public LinkedList<FieldDeclaration> getField_declartion_list() {
@@ -42,4 +44,9 @@ public class MethodDeclaration {
 		this.body = body;
 	}
 	
+	@Override
+	public <T> T accept(ASTVisitor<T> v) {
+		return v.visit(this);
+	}
+
 }
