@@ -1,0 +1,14 @@
+class main {
+	float inc(float x, float y) {
+		return x + y;
+	}
+	int read_float() extern;
+	void main() {
+		float y;
+		float x;
+		int z;
+		y = read_float();
+		x = read_float();
+		z = inc(x,y);
+	}
+}
