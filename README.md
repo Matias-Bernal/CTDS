@@ -11,12 +11,15 @@ Contenido:
 *bin
 *tools
 
-Compilacion
+Uso:
+*Compilacion:
 
-ant compile
+Genera en el directorio bin/cls
+$ant compile
 
 ant generate
 
+Para eliminar las clases generadas y la carpeta de clases
 ant clean
 
 ant jar
