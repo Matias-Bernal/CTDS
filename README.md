@@ -4,23 +4,25 @@ Proyecto 2016 - Taller Diseño de Software
 Requisitos:
 *Java 
 *Ant
+*bash
 
 Contenido:
-*src 
 *documentacion
-*bin
+*src
+*test
+*test/test_correctos
+*test/test_errores
 *tools
 
-Uso:
 *Compilacion:
+$ant
 
-Genera en el directorio bin/cls
-$ant compile
+*Cracion de archivo test/c-tds.jar:
+$ant jar
 
-ant generate
+*Ejecucion:
+$java -jar [<path>]/c-tds.jar [<path>]/<archivo>.ctds
 
-Para eliminar las clases generadas y la carpeta de clases
-ant clean
-
-ant jar
-
+*Test:
+En la carpeta de test ejecutar
+./runTests.sh

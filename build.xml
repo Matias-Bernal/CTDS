@@ -3,6 +3,7 @@
 	  <property name="java"     location="src"       />
 	  <property name="classes"  location="bin/cls"   />
 	  <property name="result"   location="bin/jar"   />
+	  <property name="test"   location="test"   />
 	  <property name="lib"      location="lib"       />
 	  <property name="tools"    location="tools"     />
 	  <property name="base"    location="."     />
@@ -10,8 +11,15 @@
 	  <taskdef name="jflex" classname="JFlex.anttask.JFlexTask"  classpath="${tools}/JFlex.jar"   />
 	  <taskdef name="cup"   classname="java_cup.anttask.CUPTask" classpath="${tools}/java-cup-11b.jar"  />
 
-	  <target name="generate">
-	    
+	  <target name="clean">
+	    <delete file="${java}/cup/example/Parser.java" />
+	    <delete file="${java}/cup/example/sym.java" />
+	    <delete file="${java}/Scanner.java" />
+	    <delete dir="${classes}" />
+	    <delete dir="${result}" />
+	  </target>
+
+	  <target name="generate" depends="clean">
 	    <cup srcfile="${base}/parser.cup"  destdir="${java}"
 	          parser="Parser"
 			  interface="true"
@@ -33,11 +41,19 @@
 	    </javac>
 	  </target>
 
-	  <target name="clean">
-	    <delete file="${java}/Parser.java" />
-	    <delete file="${java}/sym.java" />
-	    <delete file="${java}/Scanner.java" />
-	    <delete dir="${classes}" />
-	    <delete dir="${result}" />
+	  <target name="jar" depends="compile">
+	    <jar jarfile="${result}/c-tds.jar" basedir="${classes}">
+	     <manifest>
+	       <attribute name="Main-Class" value="cup.example.Driver" />
+	       <attribute name="Class-Path" value="java-cup-11b-runtime.jar" />
+	     </manifest>
+	    </jar>
+	    <copy todir="${result}">
+			<fileset dir="${tools}" includes="**/**.jar"/>
+	    </copy>
+	    <copy file="${result}/c-tds.jar" todir="${tools}"/>
+	    <copy todir="${test}">
+	    	<fileset dir="${tools}" includes="**/**.jar"/>
+    	</copy>
 	  </target>
 </project>

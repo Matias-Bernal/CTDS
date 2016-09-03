@@ -16,13 +16,13 @@ import java.io.FileInputStream;
 parser code {:
   public boolean syntaxErrors;
   protected Lexer lexer;
+  public File file;
 :}
 
 /* define how to connect to the scanner! */
 init with {:
   ComplexSymbolFactory f = new ComplexSymbolFactory();
   symbolFactory = f;
-  File file = new File("fuente.ctds");
   FileInputStream fis = null;
   try {
     fis = new FileInputStream(file);
